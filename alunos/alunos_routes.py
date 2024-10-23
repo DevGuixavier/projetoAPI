@@ -1,43 +1,39 @@
-from flask import Blueprint, request, jsonify,render_template,redirect, url_for
-
+from flask import Blueprint, request, jsonify
 from .alunos_model import AlunoNaoEncontrado, listar_alunos, aluno_por_id, adicionar_aluno, atualizar_aluno, excluir_aluno
-from config import db
 
-alunos_blueprint = Blueprint('alunos', __name__)
+aluno_bp = Blueprint('alunos', __name__)
 
-@alunos_blueprint.route('/alunos', methods=['GET'])
-def get_alunos():
+@aluno_bp.route('/alunos', methods=['GET'])
+def listar_todos_alunos():
     return jsonify(listar_alunos())
 
-@alunos_blueprint.route('/alunos/<int:id_aluno>', methods=['GET'])
-def get_aluno(id_aluno):
+@aluno_bp.route('/alunos/<int:id>', methods=['GET'])
+def obter_aluno(id):
     try:
-        aluno = aluno_por_id(id_aluno)
+        aluno = aluno_por_id(id)
         return jsonify(aluno)
     except AlunoNaoEncontrado:
-        return jsonify({'message': 'Aluno não encontrado'}), 404
-    
+        return jsonify({'error': 'Aluno não encontrado'}), 404
 
-@alunos_blueprint.route('/alunos', methods=['POST'])
-def create_aluno():
+@aluno_bp.route('/alunos', methods=['POST'])
+def adicionar_novo_aluno():
+    dados = request.get_json()
+    adicionar_aluno(dados)
+    return jsonify({'message': 'Aluno adicionado com sucesso!'}), 201
 
-    data = request.json
-    adicionar_aluno(data)
-    return jsonify(data), 201
-
-@alunos_blueprint.route('/alunos/<int:id_aluno>', methods=['PUT'])
-def update_aluno(id_aluno):
-    data = request.json
+@aluno_bp.route('/alunos/<int:id>', methods=['PUT'])
+def atualizar_aluno_existente(id):
+    dados = request.get_json()
     try:
-        atualizar_aluno(id_aluno, data)
-        return jsonify(aluno_por_id(id_aluno))
+        atualizar_aluno(id, dados)
+        return jsonify({'message': 'Aluno atualizado com sucesso!'})
     except AlunoNaoEncontrado:
-        return jsonify({'message': 'Aluno não encontrado'}), 404
+        return jsonify({'error': 'Aluno não encontrado'}), 404
 
-@alunos_blueprint.route('/alunos/<int:id_aluno>', methods=['DELETE'])
-def delete_aluno(id_aluno):
+@aluno_bp.route('/alunos/<int:id>', methods=['DELETE'])
+def excluir_aluno_existente(id):
     try:
-        excluir_aluno(id_aluno)
-        return '', 204
+        excluir_aluno(id)
+        return jsonify({'message': 'Aluno excluído com sucesso!'}), 200
     except AlunoNaoEncontrado:
-        return jsonify({'message': 'Aluno não encontrado'}), 404
+        return jsonify({'error': 'Aluno não encontrado'}), 404
