@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atualizar Aluno</title>
+  <title>Atualizar Turma</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -49,12 +49,15 @@
 
 <body>
   <div class="container">
-    <h1>Atualizar Aluno</h1>
-    <form action="{{ url_for('alunos.update_aluno', id_aluno=aluno.id) }}" method="POST">
+    <h1>Atualizar Turma</h1>
+    <form action="{{ url_for('turmas.update_turma', id_turma=turma.id) }}" method="POST">
       <input type="hidden" name="_method" value="PUT">
       
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" name="nome" value="{{ aluno.nome }}" required>
+      <label for="nome">Nome da Turma:</label>
+      <input type="text" id="nome" name="nome" value="{{ turma.nome }}" required>
+
+      <label for="descricao">Descrição:</label>
+      <input type="text" id="descricao" name="descricao" value="{{ turma.descricao }}" required>
 
       <button type="submit">Atualizar</button>
     </form>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Alunos</title>
+  <title>Lista de Turmas</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,16 +42,16 @@
 
 <body>
   <div class="container">
-    <h1>Lista de Alunos</h1>
+    <h1>Lista de Turmas</h1>
     <ul>
-      {% for aluno in alunos %}
+      {% for turma in turmas %}
       <li>
-        <a href="{{ url_for('alunos.get_aluno', id_aluno=aluno.id) }}">
-          {{ aluno.nome }} (ID: {{ aluno.id }})
+        <a href="{{ url_for('turmas.get_turma', id_turma=turma.id) }}">
+          {{ turma.nome }} (ID: {{ turma.id }})
         </a>
       </li>
       {% else %}
-      <li>Nenhum aluno encontrado.</li>
+      <li>Nenhuma turma encontrada.</li>
       {% endfor %}
     </ul>
   </div>

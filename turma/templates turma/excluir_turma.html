@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Turma</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .details {
+      margin-bottom: 20px;
+    }
+    .button {
+      padding: 10px 15px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button:hover {
+      background-color: #c0392b;
+    }
+    a {
+      text-decoration: none;
+      color: #3498db;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Detalhes da Turma</h1>
+    <div class="details">
+      <p><strong>ID:</strong> {{ turma.id }}</p>
+      <p><strong>Nome:</strong> {{ turma.nome }}</p>
+      <p><strong>Descrição:</strong> {{ turma.descricao }}</p>
+    </div>
+
+    <form id="delete-form" action="{{ url_for('turmas.delete_turma', id_turma=turma.id) }}" method="POST">
+      <input type="hidden" name="_method" value="DELETE">
+      <button type="submit" class="button">Excluir Turma</button>
+    </form>
+    <br>
+    <a href="{{ url_for('turmas.get_turmas') }}">Voltar para a lista de turmas</a>
+  </div>
+</body>
+
+</html>
