@@ -26,12 +26,14 @@ class Professor(db.Model):
         }
 
 class ProfessorNaoEncontrado(Exception):
-    pass
+    def __init__(self, id_professor):
+        self.id_professor = id_professor
+        super().__init__(f"Professor com ID {id_professor} não encontrado.")
 
 def professor_por_id(id_professor):
     professor = Professor.query.get(id_professor)
     if not professor:
-        raise ProfessorNaoEncontrado
+        raise ProfessorNaoEncontrado(id_professor)
     return professor.to_dict()
 
 def listar_professores():
@@ -39,28 +41,53 @@ def listar_professores():
     return [professor.to_dict() for professor in professores]
 
 def adicionar_professor(dados):
+    if dados['idade'] < 0:
+        raise ValueError("A idade deve ser um número positivo.")
+    
     novo_professor = Professor(
         nome=dados['nome'],
         idade=dados['idade'],
         materia=dados['materia'],
         observacoes=dados.get('observacoes')
     )
-    db.session.add(novo_professor)
-    db.session.commit()
+    
+    try:
+        db.session.add(novo_professor)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Erro ao adicionar professor: {str(e)}")
 
 def atualizar_professor(id_professor, novos_dados):
     professor = Professor.query.get(id_professor)
     if not professor:
-        raise ProfessorNaoEncontrado
-    professor.nome = novos_dados['nome']
-    professor.idade = novos_dados['idade']
-    professor.materia = novos_dados['materia']
-    professor.observacoes = novos_dados.get('observacoes')
-    db.session.commit()
+        raise ProfessorNaoEncontrado(id_professor)
+
+    if 'nome' in novos_dados:
+        professor.nome = novos_dados['nome']
+    if 'idade' in novos_dados:
+        if novos_dados['idade'] < 0:
+            raise ValueError("A idade deve ser um número positivo.")
+        professor.idade = novos_dados['idade']
+    if 'materia' in novos_dados:
+        professor.materia = novos_dados['materia']
+    if 'observacoes' in novos_dados:
+        professor.observacoes = novos_dados.get('observacoes')
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Erro ao atualizar professor: {str(e)}")
 
 def excluir_professor(id_professor):
     professor = Professor.query.get(id_professor)
     if not professor:
-        raise ProfessorNaoEncontrado
-    db.session.delete(professor)
-    db.session.commit()
+        raise ProfessorNaoEncontrado(id_professor)
+    
+    try:
+        db.session.delete(professor)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Erro ao excluir professor: {str(e)}")

@@ -2,7 +2,7 @@ from config import db
 
 class Turma(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    descricao = db.Column(db.String(100))
+    descricao = db.Column(db.String(100), nullable=False)
     ativo = db.Column(db.Boolean, default=True)
 
     # Relacionamento com Professor
@@ -25,12 +25,13 @@ class Turma(db.Model):
         }
 
 class TurmaNaoEncontrada(Exception):
-    pass
+    def __init__(self, id_turma):
+        super().__init__(f'Turma com id {id_turma} não encontrada.')
 
 def turma_por_id(id_turma):
     turma = Turma.query.get(id_turma)
     if not turma:
-        raise TurmaNaoEncontrada
+        raise TurmaNaoEncontrada(id_turma)
     return turma.to_dict()
 
 def listar_turmas():
@@ -38,6 +39,10 @@ def listar_turmas():
     return [turma.to_dict() for turma in turmas]
 
 def adicionar_turma(dados):
+    # Validação básica dos dados
+    if 'descricao' not in dados or 'professor_id' not in dados:
+        raise ValueError('Dados inválidos. Certifique-se de incluir descrição e professor_id.')
+
     nova_turma = Turma(
         descricao=dados['descricao'],
         professor_id=dados['professor_id'],
@@ -49,7 +54,12 @@ def adicionar_turma(dados):
 def atualizar_turma(id_turma, novos_dados):
     turma = Turma.query.get(id_turma)
     if not turma:
-        raise TurmaNaoEncontrada
+        raise TurmaNaoEncontrada(id_turma)
+
+    # Validação básica dos dados
+    if 'descricao' not in novos_dados or 'professor_id' not in novos_dados:
+        raise ValueError('Dados inválidos. Certifique-se de incluir descrição e professor_id.')
+
     turma.descricao = novos_dados['descricao']
     turma.professor_id = novos_dados['professor_id']
     turma.ativo = novos_dados.get('ativo', True)
@@ -58,6 +68,6 @@ def atualizar_turma(id_turma, novos_dados):
 def excluir_turma(id_turma):
     turma = Turma.query.get(id_turma)
     if not turma:
-        raise TurmaNaoEncontrada
+        raise TurmaNaoEncontrada(id_turma)
     db.session.delete(turma)
     db.session.commit()
